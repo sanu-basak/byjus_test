@@ -10,12 +10,15 @@ use App\User;
 use App\Rules\EmailValidation;
 use Api;
 use App\Http\Resources\UserResource;
+use App\Models\Gender;
+
 
 class UserController extends Controller
 {
-    public function __construct(User $user)
+    public function __construct(User $user,Gender $gender)
     {
-        $this->user = $user;
+        $this->user   = $user;
+        $this->gender = $gender;
     }
 
     /**
@@ -75,6 +78,10 @@ class UserController extends Controller
             if($validator->fails()){
     
                 return response()->json(Api::validationResponse($validator),422);
+            }
+
+            if(!$this->gender->exists()){
+                \Artisan::call('db:seed');
             }
     
             $user = $this->user->create([
